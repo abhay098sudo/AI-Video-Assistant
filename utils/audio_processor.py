@@ -2,8 +2,12 @@ import yt_dlp
 from pydub import AudioSegment
 import os
 
-AudioSegment.converter = r"C:\Users\avsin\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffmpeg.exe"
-AudioSegment.ffprobe = r"C:\Users\avsin\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffprobe.exe"
+ffmpeg_path = os.getenv("FFMPEG_PATH")
+ffprobe_path = os.getenv("FFPROBE_PATH")
+if ffmpeg_path:
+    AudioSegment.converter = ffmpeg_path
+if ffprobe_path:
+    AudioSegment.ffprobe = ffprobe_path
 
 DOWNLOAD_DIR = "downloades"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -13,19 +17,22 @@ def download_youtube_audio(url: str) -> str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
 
     ydl_opts = {
-        "format": "bestaudio[ext=m4a]/bestaudio/best",
+        "format": "bestaudio/best",
         "outtmpl": output_path,
+        "noplaylist": True,
         "quiet": False,
         "nocheckcertificate": True,
         "geo_bypass": True,
+        "socket_timeout": 30,
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/137.0 Safari/537.36",
+            "Referer": "https://www.youtube.com/",
+        },
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "web"]
+                "player_client": ["android", "web"],
             }
         },
-        "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/137.0 Safari/537.36"
-        }
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
