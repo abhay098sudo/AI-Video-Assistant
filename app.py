@@ -543,3 +543,4 @@ else:
             <span class="badge badge-green">RAG Chat</span>
         </div>
     </div>""", unsafe_allow_html=True)
+    st.write("✅ App Started Successfully")
